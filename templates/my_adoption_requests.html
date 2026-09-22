@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}My Adoption Requests - PetRescue{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">My Adoption Applications</h1>
+        <p style="color: var(--text-secondary);">Track the real-time status of your pet adoption requests.</p>
+    </div>
+    <a href="{% url 'adoption_listings' %}" class="btn btn-primary" style="background: #16a34a; font-size: 0.85rem;">+ Browse Adoptable Pets</a>
+</div>
+
+{% if adoption_requests %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>App ID</th>
+                    <th>Adoptable Pet</th>
+                    <th>Housing Setup</th>
+                    <th>Application Date</th>
+                    <th>Status</th>
+                    <th>Admin Notes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in adoption_requests %}
+                    <tr>
+                        <td style="font-weight: 700;">#APP-{{ req.id }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <img src="{{ req.adoptable_pet.image_url }}" alt="{{ req.adoptable_pet.name }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                <div>
+                                    <strong>{{ req.adoptable_pet.name }}</strong>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ req.adoptable_pet.species }} ({{ req.adoptable_pet.breed }})</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ req.housing_type }}</td>
+                        <td>{{ req.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge {{ req.badge_class }}">{{ req.status }}</span>
+                        </td>
+                        <td style="font-size: 0.85rem; color: var(--text-secondary);">{{ req.admin_notes|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'adoption_detail' req.adoptable_pet.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.85rem;">View Pet</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 4rem 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🐾</div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">No Adoption Applications Yet</h3>
+        <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 1.5rem auto;">
+            You have not submitted any adoption requests. Browse our adoption listings to find a companion!
+        </p>
+        <a href="{% url 'adoption_listings' %}" class="btn btn-primary" style="background: #16a34a;">Browse Adoptable Pets</a>
+    </div>
+{% endif %}
+{% endblock %}

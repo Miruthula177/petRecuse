@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Administrator Dashboard - PetRescue{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 2rem;">🛡️</span>
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">Administrator Management Portal</h1>
+            <p style="color: var(--text-secondary);">Review, verify, and approve incoming lost & found pet reports.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Stat Metrics -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 2.5rem;">
+    <div class="stat-card">
+        <div class="stat-number" style="color: var(--primary);">{{ total_reports }}</div>
+        <div class="stat-label">Total Reports</div>
+    </div>
+    <div class="stat-card" style="border: 2px solid #fde68a; background: #fffbeeb3;">
+        <div class="stat-number" style="color: #b45309;">{{ pending_count }}</div>
+        <div class="stat-label">Pending Verification</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color: #15803d;">{{ approved_count }}</div>
+        <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color: #b91c1c;">{{ rejected_count }}</div>
+        <div class="stat-label">Rejected</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color: #7c3aed;">{{ total_users }}</div>
+        <div class="stat-label">Registered Users</div>
+    </div>
+</div>
+
+<!-- Pending Verification Queue -->
+<div class="card" style="margin-bottom: 2.5rem; background: #ffffff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">
+            Pending Reports Verification Queue ({{ pending_count }})
+        </h2>
+        <span class="badge badge-pending">Action Required</span>
+    </div>
+
+    {% if pending_reports %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Type</th>
+                        <th>Reporter</th>
+                        <th>Pet Species / Breed</th>
+                        <th>Location</th>
+                        <th>Submission Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in pending_reports %}
+                        <tr>
+                            <td style="font-weight: 700;">#{{ report.id }}</td>
+                            <td>
+                                <span class="badge {% if report.report_type == 'LOST' %}badge-type-lost{% else %}badge-type-found{% endif %}">
+                                    {{ report.get_report_type_display }}
+                                </span>
+                            </td>
+                            <td>{{ report.user.first_name|default:report.user.username }}</td>
+                            <td>
+                                <strong>{{ report.pet_type }}</strong>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ report.breed }} ({{ report.color }})</div>
+                            </td>
+                            <td>{{ report.location }}</td>
+                            <td>{{ report.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'admin_verify' report.pk %}" class="btn btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.85rem; background: #7c3aed;">
+                                    Verify Report &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-secondary);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✅</div>
+            <p style="font-size: 1.05rem; font-weight: 600;">Verification queue is empty!</p>
+            <p style="font-size: 0.9rem;">All submitted pet reports have been reviewed.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Recent Activity Audit Log -->
+<div class="card" style="background: #ffffff;">
+    <h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">Recently Reviewed Reports</h2>
+    
+    {% if recent_activity %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Pet Details</th>
+                        <th>Location</th>
+                        <th>Verified Status</th>
+                        <th>Admin Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_activity %}
+                        <tr>
+                            <td>#{{ item.id }}</td>
+                            <td>
+                                <span class="badge {% if item.report_type == 'LOST' %}badge-type-lost{% else %}badge-type-found{% endif %}">
+                                    {{ item.get_report_type_display }}
+                                </span>
+                            </td>
+                            <td>{{ item.pet_type }} - {{ item.breed }}</td>
+                            <td>{{ item.location }}</td>
+                            <td><span class="badge {{ item.badge_class }}">{{ item.status }}</span></td>
+                            <td style="font-size: 0.85rem; color: var(--text-secondary);">{{ item.admin_notes|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">No previously reviewed reports recorded yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

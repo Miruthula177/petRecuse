@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Adoption Management - PetRescue{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">Admin Adoption Management</h1>
+        <p style="color: var(--text-secondary);">Manage adoptable pet listings and review user adoption applications.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Rescue Portal Dashboard</a>
+        <a href="{% url 'admin_add_adoptable_pet' %}" class="btn btn-primary" style="background: #16a34a;">+ Add Adoptable Pet</a>
+    </div>
+</div>
+
+<!-- Adoption Metrics Grid -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 2.5rem;">
+    <div class="stat-card">
+        <div class="stat-number" style="color: var(--primary);">{{ total_pets }}</div>
+        <div class="stat-label">Total Adoption Listings</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color: #16a34a;">{{ available_count }}</div>
+        <div class="stat-label">Available for Adoption</div>
+    </div>
+    <div class="stat-card" style="border: 2px solid #fde68a; background: #fffbeeb3;">
+        <div class="stat-number" style="color: #b45309;">{{ pending_req_count }}</div>
+        <div class="stat-label">Pending Applications</div>
+    </div>
+</div>
+
+<!-- Section 1: Pending Adoption Applications Queue -->
+<div class="card" style="margin-bottom: 2.5rem; background: #ffffff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">
+            Pending Adoption Applications ({{ pending_req_count }})
+        </h2>
+        <span class="badge badge-pending">Action Required</span>
+    </div>
+
+    {% if pending_requests %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>App ID</th>
+                        <th>Applicant</th>
+                        <th>Target Pet</th>
+                        <th>Housing</th>
+                        <th>Application Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in pending_requests %}
+                        <tr>
+                            <td style="font-weight: 700;">#APP-{{ req.id }}</td>
+                            <td>
+                                <strong>{{ req.user.first_name|default:req.user.username }}</strong>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ req.user.email }}</div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="{{ req.adoptable_pet.image_url }}" alt="{{ req.adoptable_pet.name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                    <strong>{{ req.adoptable_pet.name }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ req.housing_type }}</td>
+                            <td>{{ req.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'admin_review_adoption_request' req.pk %}" class="btn btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.85rem; background: #7c3aed;">
+                                    Review Application &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-secondary);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✅</div>
+            <p style="font-size: 1.05rem; font-weight: 600;">No pending adoption applications!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Section 2: Adoptable Pet Listings Management -->
+<div class="card" style="background: #ffffff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">All Adoptable Pet Listings</h2>
+        <a href="{% url 'admin_add_adoptable_pet' %}" class="btn btn-secondary" style="font-size: 0.85rem;">+ Add New Pet</a>
+    </div>
+
+    {% if adoptable_pets %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Pet ID</th>
+                        <th>Pet Image & Name</th>
+                        <th>Species & Breed</th>
+                        <th>Age / Gender</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pet in adoptable_pets %}
+                        <tr>
+                            <td style="font-weight: 700;">#PET-{{ pet.id }}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <img src="{{ pet.image_url }}" alt="{{ pet.name }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                    <strong>{{ pet.name }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ pet.species }} - {{ pet.breed }}</td>
+                            <td>{{ pet.age }} yrs ({{ pet.gender }})</td>
+                            <td>{{ pet.location }}</td>
+                            <td><span class="badge {{ pet.badge_class }}">{{ pet.status }}</span></td>
+                            <td>
+                                <a href="{% url 'adoption_detail' pet.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.85rem;">View Listing</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">No adoptable pet listings recorded yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Adoption Application - {{ pet.name }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 2rem;">📝</span>
+        <h2 class="form-title">Adoption Application for {{ pet.name }}</h2>
+    </div>
+    <p class="form-subtitle">Please complete the application form below. Our adoption coordinators will review your details.</p>
+
+    <!-- Pet Summary Card -->
+    <div style="display: flex; align-items: center; gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+        <img src="{{ pet.image_url }}" alt="{{ pet.name }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover;">
+        <div>
+            <div style="font-weight: 700; font-size: 1.1rem;">{{ pet.name }} ({{ pet.species }})</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">Breed: {{ pet.breed }} | Age: {{ pet.age }} yrs | Location: {{ pet.location }}</div>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'adoption_request' pet.pk %}" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.housing_type.id_for_label }}" class="form-label">Housing Setup *</label>
+            {{ form.housing_type }}
+            {% if form.housing_type.errors %}<div class="form-error">{{ form.housing_type.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.experience.id_for_label }}" class="form-label">Previous Pet Experience *</label>
+            {{ form.experience }}
+            {% if form.experience.errors %}<div class="form-error">{{ form.experience.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.reason.id_for_label }}" class="form-label">Reason for Adoption & Care Plan *</label>
+            {{ form.reason }}
+            {% if form.reason.errors %}<div class="form-error">{{ form.reason.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.contact.id_for_label }}" class="form-label">Contact Phone & Preferred Contact Hours *</label>
+            {{ form.contact }}
+            {% if form.contact.errors %}<div class="form-error">{{ form.contact.errors.0 }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem; background: #16a34a;">
+            Submit Adoption Application
+        </button>
+    </form>
+</div>
+{% endblock %}

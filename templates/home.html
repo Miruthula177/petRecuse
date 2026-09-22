@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - PetRescue Management Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%), url('{% static "images/hero_banner.jpg" %}') center/cover no-repeat;">
+    <div class="hero-content">
+        <h1 class="hero-title">Reuniting Lost Pets with Loving Homes</h1>
+        <p class="hero-subtitle">
+            A verified digital rescue network to report lost pets, submit found pet reports, and manage pet rescue activities with official admin verification.
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'report_lost' %}" class="btn btn-primary" style="background: #e11d48;">🚨 Report Lost Pet</a>
+            <a href="{% url 'report_found' %}" class="btn btn-primary" style="background: #0d9488;">🔍 Report Found Pet</a>
+            <a href="{% url 'search' %}" class="btn btn-secondary">Search All Pets</a>
+        </div>
+    </div>
+</section>
+
+<!-- Live Counter Stats -->
+<section class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" style="color: #e11d48;">{{ total_lost }}</div>
+        <div class="stat-label">Lost Pets Reported</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color: #0d9488;">{{ total_found }}</div>
+        <div class="stat-label">Found Pets Reported</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" style="color: #16a34a;">{{ reunited_count }}</div>
+        <div class="stat-label">Reunited & Rescued Pets</div>
+    </div>
+</section>
+
+<!-- Pet Category Quick Filters -->
+<section style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-primary);">Explore by Pet Category</h2>
+    <div class="grid-4">
+        <a href="{% url 'search' %}?pet_type=Dog" class="card" style="padding: 0; overflow: hidden; text-align: center; text-decoration: none;">
+            <img src="{% static 'images/default_dog.jpg' %}" alt="Dogs" style="width: 100%; height: 140px; object-fit: cover;">
+            <div style="padding: 0.85rem; font-weight: 700; color: var(--text-primary);">🐕 Dogs</div>
+        </a>
+        <a href="{% url 'search' %}?pet_type=Cat" class="card" style="padding: 0; overflow: hidden; text-align: center; text-decoration: none;">
+            <img src="{% static 'images/default_cat.jpg' %}" alt="Cats" style="width: 100%; height: 140px; object-fit: cover;">
+            <div style="padding: 0.85rem; font-weight: 700; color: var(--text-primary);">🐈 Cats</div>
+        </a>
+        <a href="{% url 'search' %}?pet_type=Bird" class="card" style="padding: 0; overflow: hidden; text-align: center; text-decoration: none;">
+            <div style="width: 100%; height: 140px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; font-size: 3.5rem;">🦜</div>
+            <div style="padding: 0.85rem; font-weight: 700; color: var(--text-primary);">🦜 Birds</div>
+        </a>
+        <a href="{% url 'search' %}?pet_type=Other" class="card" style="padding: 0; overflow: hidden; text-align: center; text-decoration: none;">
+            <div style="width: 100%; height: 140px; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 3.5rem;">🐇</div>
+            <div style="padding: 0.85rem; font-weight: 700; color: var(--text-primary);">🐾 Other Pets</div>
+        </a>
+    </div>
+</section>
+
+<!-- Recent Approved Reports -->
+<section style="margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--text-primary);">Recent Verified Pet Reports</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Browse recent reports verified by our portal administrators.</p>
+        </div>
+        <a href="{% url 'search' %}" class="btn btn-secondary">View All Reports &rarr;</a>
+    </div>
+
+    {% if recent_reports %}
+        <div class="grid-3">
+            {% for pet in recent_reports %}
+                <div class="card pet-card">
+                    <img src="{{ pet.image_url }}" alt="{{ pet.pet_type }}" class="pet-card-image">
+                    
+                    <div class="pet-card-body">
+                        <div class="pet-card-title">
+                            <span>{{ pet.pet_name|default:pet.pet_type }}</span>
+                            <span class="badge {% if pet.report_type == 'LOST' %}badge-type-lost{% else %}badge-type-found{% endif %}">
+                                {{ pet.get_report_type_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="pet-card-meta">
+                            <div class="meta-item">📍 <strong>Location:</strong> {{ pet.location }}</div>
+                            <div class="meta-item">🎨 <strong>Breed/Color:</strong> {{ pet.breed }} ({{ pet.color }})</div>
+                            <div class="meta-item">📅 <strong>Date:</strong> {{ pet.lost_found_date|date:"M d, Y" }}</div>
+                        </div>
+
+                        <div class="pet-card-footer">
+                            <span class="badge badge-approved">VERIFIED</span>
+                            <a href="{% url 'report_detail' pet.pk %}" class="btn btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 3rem 1.5rem;">
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">No verified reports available yet.</p>
+            <a href="{% url 'report_lost' %}" class="btn btn-primary">Submit First Report</a>
+        </div>
+    {% endif %}
+</section>
+
+
+<!-- Feature Highlights -->
+<section style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center;">Portal Workflow Highlights</h2>
+    <div class="grid-3">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">📋</div>
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">1. Comprehensive Reporting</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Pet owners and rescuers easily upload pet details, date, exact location, contact phone, and photos.</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">🛡️</div>
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">2. Admin Verification</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Every report is reviewed by portal admins before public publishing to prevent spam and fake entries.</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">🏠</div>
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">3. Pet Adoption Program</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Browse verified adoptable pets, submit adoption applications, and provide forever homes.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 5: Adoptable Pets Integration -->
+<section style="margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--text-primary);">Find Your New Companion</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Adopt a rescued or shelter pet looking for a loving home.</p>
+        </div>
+        <a href="{% url 'adoption_listings' %}" class="btn btn-primary" style="background: #16a34a;">Browse All Adoptable Pets &rarr;</a>
+    </div>
+
+    {% if adoptable_pets %}
+        <div class="grid-4">
+            {% for pet in adoptable_pets %}
+                <div class="card pet-card">
+                    <img src="{{ pet.image_url }}" alt="{{ pet.name }}" class="pet-card-image">
+                    
+                    <div class="pet-card-body">
+                        <div class="pet-card-title">
+                            <span>{{ pet.name }}</span>
+                            <span class="badge badge-approved">AVAILABLE</span>
+                        </div>
+                        
+                        <div class="pet-card-meta">
+                            <div class="meta-item">🐕 <strong>Breed:</strong> {{ pet.breed }}</div>
+                            <div class="meta-item">🎂 <strong>Age:</strong> {{ pet.age }} yrs ({{ pet.gender }})</div>
+                            <div class="meta-item">📍 <strong>Location:</strong> {{ pet.location }}</div>
+                        </div>
+
+                        <div class="pet-card-footer">
+                            <a href="{% url 'adoption_detail' pet.pk %}" class="btn btn-primary btn-block" style="padding: 0.4rem 0.9rem; font-size: 0.85rem; background: #16a34a;">
+                                View Details & Apply
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 2.5rem 1.5rem; background: #ffffff;">
+            <p style="color: var(--text-secondary); font-size: 1rem;">No adoptable pets currently listed. Check back soon!</p>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

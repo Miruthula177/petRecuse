@@ -1,0 +1,26 @@
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+db.sqlite3
+*.sqlite3
+
+# Django & Media
+staticfiles/
+media/pet_photos/
+media/adoption_photos/
+!media/pet_photos/sample_dog.jpg
+!media/pet_photos/sample_cat.jpg
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini

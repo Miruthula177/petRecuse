@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Pet Report #{{ report.id }} - Admin Portal{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">&larr; Back to Admin Queue</a>
+</div>
+
+<div class="card" style="margin-bottom: 2rem; background: #ffffff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--card-border);">
+        <div>
+            <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary);">
+                Verification Review: Report #{{ report.id }}
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Submitted by <strong>{{ report.user.username }}</strong> ({{ report.user.email }}) on {{ report.created_at|date:"F d, Y \a\t H:i" }}
+            </p>
+        </div>
+        <div>
+            <span class="badge {{ report.badge_class }}" style="font-size: 0.9rem;">CURRENT STATUS: {{ report.status }}</span>
+        </div>
+    </div>
+
+    <div class="grid-2" style="gap: 2rem; margin-bottom: 2rem;">
+        <!-- Left Column: Media & Summary -->
+        <div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">Pet Image Attachment</h3>
+            <div style="background: #0f172a; border-radius: var(--radius-md); height: 320px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 1rem;">
+                <img src="{{ report.image_url }}" alt="{{ report.pet_type }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+
+
+        <!-- Right Column: Report Specifications -->
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid #e2e8f0;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">Report Specifications</h3>
+
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.95rem;">
+                <div><strong>Report Type:</strong> {{ report.get_report_type_display }}</div>
+                <div><strong>Pet Species:</strong> {{ report.pet_type }}</div>
+                <div><strong>Pet Name:</strong> {{ report.pet_name|default:"Not specified" }}</div>
+                <div><strong>Breed:</strong> {{ report.breed }}</div>
+                <div><strong>Color:</strong> {{ report.color }}</div>
+                <div><strong>Location:</strong> {{ report.location }}</div>
+                <div><strong>Date Lost / Found:</strong> {{ report.lost_found_date|date:"F d, Y" }}</div>
+                <div><strong>Contact Phone:</strong> {{ report.contact_phone }}</div>
+                <div><strong>Contact Email:</strong> {{ report.contact_email }}</div>
+            </div>
+
+            <div style="margin-top: 1.25rem;">
+                <strong>Description:</strong>
+                <p style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid #cbd5e1; margin-top: 0.35rem; font-size: 0.9rem;">
+                    {{ report.description }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Decision Controls -->
+    <div style="background: #f0f9ff; border: 2px solid #bae6fd; padding: 1.75rem; border-radius: var(--radius-md);">
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #0369a1; margin-bottom: 0.75rem;">Administrator Verification Decision</h3>
+        <p style="font-size: 0.9rem; color: #0c4a6e; margin-bottom: 1.25rem;">
+            Approving this report will publish it to the public search page and notify the user. Rejecting will withhold it from public search.
+        </p>
+
+        <form method="POST" action="{% url 'admin_verify' report.pk %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="admin_notes" class="form-label">Administrator Feedback / Reviewer Notes</label>
+                <textarea name="admin_notes" id="admin_notes" class="form-control" rows="3" placeholder="Enter notes or reason for approval/rejection (sent to user notification)...">{{ report.admin_notes|default:'' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.25rem;">
+                <button type="submit" name="action" value="approve" class="btn btn-success" style="flex: 1; padding: 0.85rem;">
+                    ✅ Approve & Publish Listing
+                </button>
+                <button type="submit" name="action" value="reject" class="btn btn-danger" style="flex: 1; padding: 0.85rem;">
+                    ❌ Reject Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

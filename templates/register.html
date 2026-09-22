@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - PetRescue Management Portal{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Create User Account</h2>
+    <p class="form-subtitle">Register to submit lost/found pet reports and receive status notifications.</p>
+
+    <form method="POST" action="{% url 'register' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+                <div class="form-error">{{ form.full_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="form-error">{{ form.username.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="form-error">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <div class="form-error">{{ form.password.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password</label>
+            {{ form.confirm_password }}
+            {% if form.confirm_password.errors %}
+                <div class="form-error">{{ form.confirm_password.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">Create Account</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+        Already have an account? <a href="{% url 'login' %}" style="font-weight: 600;">Log In here</a>
+    </div>
+</div>
+{% endblock %}

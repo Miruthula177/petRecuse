@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - PetRescue{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">Notifications</h1>
+    <p style="color: var(--text-secondary);">Updates regarding your report verification status and pet matching alerts.</p>
+</div>
+
+{% if notifications %}
+    <div style="max-width: 800px;">
+        {% for notif in notifications %}
+            <div class="notification-card {% if not notif.is_read %}unread{% endif %}">
+                <div class="notification-icon">
+                    {% if "Approved" in notif.title %}
+                        ✅
+                    {% elif "Rejected" in notif.title %}
+                        ❌
+                    {% elif "Match" in notif.title %}
+                        🎯
+                    {% else %}
+                        🔔
+                    {% endif %}
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">{{ notif.title }}</div>
+                    <p style="color: var(--text-primary); font-size: 0.95rem; margin-bottom: 0.5rem; line-height: 1.5;">
+                        {{ notif.message|linebreaksbr }}
+                    </p>
+                    <div class="notification-time">Received {{ notif.created_at|date:"F d, Y \a\t H:i" }}</div>
+                    {% if notif.report %}
+                        <div style="margin-top: 0.5rem;">
+                            <a href="{% url 'report_detail' notif.report.pk %}" style="font-size: 0.85rem; font-weight: 600;">View Associated Report &rarr;</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 4rem 1.5rem; max-width: 800px;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">No Notifications</h3>
+        <p style="color: var(--text-secondary);">You currently have no new notifications.</p>
+    </div>
+{% endif %}
+{% endblock %}

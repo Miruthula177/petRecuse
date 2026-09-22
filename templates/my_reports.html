@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}My Reports - PetRescue{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">My Submitted Reports</h1>
+        <p style="color: var(--text-secondary);">Track the real-time status of your lost and found pet submissions.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{% url 'report_lost' %}" class="btn btn-primary" style="background: #e11d48; font-size: 0.85rem;">+ Report Lost Pet</a>
+        <a href="{% url 'report_found' %}" class="btn btn-primary" style="background: #0d9488; font-size: 0.85rem;">+ Report Found Pet</a>
+    </div>
+</div>
+
+{% if reports %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Type</th>
+                    <th>Pet Species / Breed</th>
+                    <th>Location</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    <tr>
+                        <td style="font-weight: 700;">#{{ report.id }}</td>
+                        <td>
+                            <span class="badge {% if report.report_type == 'LOST' %}badge-type-lost{% else %}badge-type-found{% endif %}">
+                                {{ report.get_report_type_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>{{ report.pet_type }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ report.breed }} ({{ report.color }})</div>
+                        </td>
+                        <td>{{ report.location }}</td>
+                        <td>{{ report.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge {{ report.badge_class }}">{{ report.status }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'report_detail' report.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.85rem;">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 4rem 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🐾</div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">No Submitted Reports Yet</h3>
+        <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 1.5rem auto;">
+            You have not submitted any lost or found pet reports. You can submit one using the buttons above.
+        </p>
+    </div>
+{% endif %}
+{% endblock %}

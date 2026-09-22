@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Pet Reports - PetRescue{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">Search Verified Pet Reports</h1>
+    <p style="color: var(--text-secondary);">Search through public, admin-verified lost and found pet reports.</p>
+</div>
+
+<!-- Search Filter Card -->
+<div class="card" style="margin-bottom: 2rem; background: #ffffff;">
+    <form method="GET" action="{% url 'search' %}">
+        <div class="grid-4" style="margin-bottom: 1rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Report Type</label>
+                <select name="report_type" class="form-select">
+                    <option value="">All Types (Lost & Found)</option>
+                    <option value="LOST" {% if filter_report_type == 'LOST' %}selected{% endif %}>Lost Pets Only</option>
+                    <option value="FOUND" {% if filter_report_type == 'FOUND' %}selected{% endif %}>Found Pets Only</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Pet Species</label>
+                <select name="pet_type" class="form-select">
+                    <option value="">All Species</option>
+                    <option value="Dog" {% if filter_pet_type == 'Dog' %}selected{% endif %}>Dog</option>
+                    <option value="Cat" {% if filter_pet_type == 'Cat' %}selected{% endif %}>Cat</option>
+                    <option value="Bird" {% if filter_pet_type == 'Bird' %}selected{% endif %}>Bird</option>
+                    <option value="Other" {% if filter_pet_type == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Breed</label>
+                <input type="text" name="breed" value="{{ filter_breed }}" class="form-control" placeholder="e.g. Labrador">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Color / Markings</label>
+                <input type="text" name="color" value="{{ filter_color }}" class="form-control" placeholder="e.g. Brown, White">
+            </div>
+        </div>
+
+        <div class="grid-2" style="align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Location / Area</label>
+                <input type="text" name="location" value="{{ filter_location }}" class="form-control" placeholder="e.g. Downtown, Park Road, City">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">🔍 Search Database</button>
+                <a href="{% url 'search' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Results Header -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.3rem; font-weight: 700;">Matching Results ({{ total_results }})</h2>
+    <span class="badge badge-approved">Displaying Approved Listings Only</span>
+</div>
+
+<!-- Results Grid -->
+{% if reports %}
+    <div class="grid-3">
+        {% for pet in reports %}
+            <div class="card pet-card">
+                <img src="{{ pet.image_url }}" alt="{{ pet.pet_type }}" class="pet-card-image">
+                
+                <div class="pet-card-body">
+                    <div class="pet-card-title">
+                        <span>{{ pet.pet_name|default:pet.pet_type }}</span>
+                        <span class="badge {% if pet.report_type == 'LOST' %}badge-type-lost{% else %}badge-type-found{% endif %}">
+                            {{ pet.get_report_type_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="pet-card-meta">
+                        <div class="meta-item">📍 <strong>Location:</strong> {{ pet.location }}</div>
+                        <div class="meta-item">🎨 <strong>Breed & Color:</strong> {{ pet.breed }} ({{ pet.color }})</div>
+                        <div class="meta-item">📅 <strong>Date:</strong> {{ pet.lost_found_date|date:"M d, Y" }}</div>
+                    </div>
+
+                    <div class="pet-card-footer">
+                        <span class="badge badge-approved">VERIFIED</span>
+                        <a href="{% url 'report_detail' pet.pk %}" class="btn btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">View Full Details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+
+    <div class="card" style="text-align: center; padding: 4rem 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔎</div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">No Matching Pet Reports Found</h3>
+        <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 1.5rem auto;">
+            No verified reports matched your search criteria. Try broadening your location or breed filter parameters.
+        </p>
+        <a href="{% url 'search' %}" class="btn btn-secondary">Clear Filters</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Adoptable Pet - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 2rem;">🐾</span>
+        <h2 class="form-title">List New Adoptable Pet</h2>
+    </div>
+    <p class="form-subtitle">Create a new pet listing available for adoption in the portal registry.</p>
+
+    <form method="POST" action="{% url 'admin_add_adoptable_pet' %}" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="grid-2" style="gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}" class="form-label">Pet Name *</label>
+                {{ form.name }}
+                {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.species.id_for_label }}" class="form-label">Species *</label>
+                {{ form.species }}
+                {% if form.species.errors %}<div class="form-error">{{ form.species.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.breed.id_for_label }}" class="form-label">Breed *</label>
+                {{ form.breed }}
+                {% if form.breed.errors %}<div class="form-error">{{ form.breed.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.age.id_for_label }}" class="form-label">Age (Years) *</label>
+                {{ form.age }}
+                {% if form.age.errors %}<div class="form-error">{{ form.age.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.gender.id_for_label }}" class="form-label">Gender *</label>
+                {{ form.gender }}
+                {% if form.gender.errors %}<div class="form-error">{{ form.gender.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.color.id_for_label }}" class="form-label">Color / Markings</label>
+                {{ form.color }}
+                {% if form.color.errors %}<div class="form-error">{{ form.color.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.location.id_for_label }}" class="form-label">Location / Shelter *</label>
+                {{ form.location }}
+                {% if form.location.errors %}<div class="form-error">{{ form.location.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.health_status.id_for_label }}" class="form-label">Health Status *</label>
+                {{ form.health_status }}
+                {% if form.health_status.errors %}<div class="form-error">{{ form.health_status.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description & Personality Traits *</label>
+            {{ form.description }}
+            {% if form.description.errors %}<div class="form-error">{{ form.description.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="grid-2" style="gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.image.id_for_label }}" class="form-label">Pet Photo Upload</label>
+                {{ form.image }}
+                {% if form.image.errors %}<div class="form-error">{{ form.image.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.status.id_for_label }}" class="form-label">Availability Status *</label>
+                {{ form.status }}
+                {% if form.status.errors %}<div class="form-error">{{ form.status.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem; background: #16a34a;">
+            Save & Publish Adoptable Pet
+        </button>
+    </form>
+</div>
+{% endblock %}

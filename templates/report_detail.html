@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Pet Report Details - PetRescue{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <a href="javascript:history.back()" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">&larr; Back</a>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden; background: #ffffff;">
+    <div class="grid-2" style="gap: 0;">
+        <!-- Left Side: Photo -->
+        <div style="background: #0f172a; min-height: 380px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <img src="{{ report.image_url }}" alt="{{ report.pet_type }}" style="width: 100%; height: 100%; max-height: 480px; object-fit: cover;">
+            
+            <div style="position: absolute; top: 1rem; left: 1rem; display: flex; gap: 0.5rem;">
+                <span class="badge {% if report.report_type == 'LOST' %}badge-type-lost{% else %}badge-type-found{% endif %}">
+                    {{ report.get_report_type_display }}
+                </span>
+                <span class="badge {{ report.badge_class }}">{{ report.status }}</span>
+            </div>
+        </div>
+
+
+        <!-- Right Side: Details -->
+        <div style="padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem;">
+                    {{ report.pet_name|default:report.pet_type }}
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">Report ID: #{{ report.id }} | Submitted: {{ report.created_at|date:"F d, Y" }}</p>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                    <div><strong>Species:</strong> {{ report.pet_type }}</div>
+                    <div><strong>Breed:</strong> {{ report.breed }}</div>
+                    <div><strong>Color / Markings:</strong> {{ report.color }}</div>
+                    <div><strong>Location:</strong> {{ report.location }}</div>
+                    <div><strong>Date {% if report.report_type == 'LOST' %}Lost{% else %}Found{% endif %}:</strong> {{ report.lost_found_date|date:"F d, Y" }}</div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">Description & Notes</h3>
+                    <p style="color: var(--text-primary); background: #f8fafc; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid #e2e8f0; line-height: 1.6;">
+                        {{ report.description }}
+                    </p>
+                </div>
+
+                {% if report.admin_notes %}
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.4rem;">Administrator Notes</h3>
+                        <p style="color: #475569; background: #fffbeeb3; padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid #fde68a; font-size: 0.9rem;">
+                            {{ report.admin_notes }}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Contact Box -->
+            <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 1.25rem; border-radius: var(--radius-md);">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #0369a1; margin-bottom: 0.5rem;">Contact Information</h3>
+                {% if report.status == 'APPROVED' or is_owner_or_staff %}
+                    <div style="font-size: 0.95rem; color: #0c4a6e;">
+                        <div style="margin-bottom: 0.25rem;">📞 <strong>Phone:</strong> <a href="tel:{{ report.contact_phone }}">{{ report.contact_phone }}</a></div>
+                        <div>✉️ <strong>Email:</strong> <a href="mailto:{{ report.contact_email }}">{{ report.contact_email }}</a></div>
+                    </div>
+                {% else %}
+                    <p style="font-size: 0.85rem; color: #0284c7;">Contact details will be visible once the report is verified by an administrator.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
