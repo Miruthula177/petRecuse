@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: petrescue
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn petrescue_core.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"

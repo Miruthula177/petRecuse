@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,9 +20,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6((u^flr$bia+t)2@zkk4*#bhls3k6eu5vq)n*4ny2m*h_#^pp')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
+allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', '')
+if allowed_hosts_env:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+else:
+    ALLOWED_HOSTS = ['*']
+
+csrf_trusted_env = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if csrf_trusted_env:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_trusted_env.split(',')]
+else:
+    CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'http://*.onrender.com']
+
+# Render reverse proxy header
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -38,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,12 +83,18 @@ WSGI_APPLICATION = 'petrescue_core.wsgi.application'
 
 
 # Database Configuration
-# Primary: MySQL (via PyMySQL or mysqlclient backend)
-# Fallback: SQLite3 if DB_ENGINE is set to sqlite or MySQL connection details are not provided
+# 1. DATABASE_URL (e.g. Render PostgreSQL or external MySQL via dj-database-url)
+# 2. USE_MYSQL (explicit environment variable settings for MySQL)
+# 3. SQLite3 fallback for local development
 
-USE_MYSQL = os.environ.get('USE_MYSQL', 'False').lower() in ('true', '1', 'yes')
-
-if USE_MYSQL:
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif os.environ.get('USE_MYSQL', 'False').lower() in ('true', '1', 'yes'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -131,6 +152,15 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 # Media files (Uploaded pet photos)
 
 MEDIA_URL = '/media/'
@@ -143,4 +173,5 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
