@@ -167,39 +167,6 @@
                     </a>
                 </div>
             </header>
-
-            <!-- Main Content Area -->
-            <main class="main-content" style="margin: 1.5rem auto 2rem auto; width: 100%; max-width: 1200px;">
-                {% if messages %}
-                    <div class="alert-messages">
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">
-                                <span>{{ message }}</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                {% block content %}
-                {% endblock %}
-            </main>
-
-            <!-- Footer -->
-            <footer class="footer" style="margin-top: auto;">
-                <div class="footer-container">
-                    <div>
-                        <div class="footer-brand">🐾 PetRescue Portal</div>
-                        <p style="font-size: 0.85rem; margin-top: 0.3rem;">Centralized Digital Platform for Lost, Found, and Pet Rescue Management.</p>
-                    </div>
-                    <div>
-                        <p style="font-size: 0.85rem;">Infosys Internship Project Demonstration</p>
-                        <p style="font-size: 0.8rem; color: #64748b;">© {% now "Y" %} PetRescue Management Portal. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    </div>
-
 {% else %}
 
     <!-- Navigation Bar for Public / Non-Authenticated Visitors -->
@@ -219,8 +186,10 @@
         </div>
     </nav>
 
-    <!-- Main Content Container for Public Pages -->
-    <main class="main-content">
+{% endif %}
+
+    <!-- Main Content Container -->
+    <main class="main-content" {% if user.is_authenticated %}style="margin: 1.5rem auto 2rem auto; width: 100%; max-width: 1200px;"{% endif %}>
         {% if messages %}
             <div class="alert-messages">
                 {% for message in messages %}
@@ -231,12 +200,11 @@
             </div>
         {% endif %}
 
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer for Public Pages -->
-    <footer class="footer">
+    <!-- Footer -->
+    <footer class="footer" {% if user.is_authenticated %}style="margin-top: auto;"{% endif %}>
         <div class="footer-container">
             <div>
                 <div class="footer-brand">🐾 PetRescue Portal</div>
@@ -244,11 +212,14 @@
             </div>
             <div>
                 <p style="font-size: 0.85rem;">Infosys Internship Project Demonstration</p>
-                <p style="font-size: 0.8rem; color: #64748b;">© {% now "Y" %} PetRescue Management Portal. All rights reserved.</p>
+                <p style="font-size: 0.8rem; color: #64748b;">© 2025 PetRescue Management Portal. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
+{% if user.is_authenticated %}
+        </div>
+    </div>
 {% endif %}
 
 <script>

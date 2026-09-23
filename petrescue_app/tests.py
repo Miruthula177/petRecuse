@@ -66,7 +66,7 @@ class PetRescueTestCase(TestCase):
             'breed': 'Golden Retriever',
             'color': 'Golden',
             'location': 'Downtown Park',
-            'lost_found_date': '2026-09-20',
+            'lost_found_date': '2025-09-20',
             'description': 'Friendly golden retriever with a blue collar.',
             'contact_phone': '9876543210',
             'contact_email': 'john@example.com',
@@ -83,7 +83,7 @@ class PetRescueTestCase(TestCase):
             breed='Beagle',
             color='Tri-color',
             location='Main Street',
-            lost_found_date=datetime.date(2026, 9, 21),
+            lost_found_date=datetime.date(2025, 9, 21),
             description='Lost beagle.',
             contact_phone='9876543210',
             contact_email='john@example.com'
@@ -99,7 +99,7 @@ class PetRescueTestCase(TestCase):
             breed='Persian',
             color='White',
             location='Central Park',
-            lost_found_date=datetime.date(2026, 9, 21),
+            lost_found_date=datetime.date(2025, 9, 21),
             description='White fluffy cat.',
             contact_phone='9876543210',
             contact_email='john@example.com'
